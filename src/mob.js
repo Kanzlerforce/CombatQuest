@@ -20,7 +20,7 @@ const Mob = class {
     }
 
     print() {
-        return `Name: ${this.name}\nSTR: ${this.str}\nAGI: ${this.agi}\nHP: ${this.hp}\nGP: ${this.gp}\n`;
+        return `Name: ${this.name}\nHP: ${this.hp}\n`;
     }
 }
 
