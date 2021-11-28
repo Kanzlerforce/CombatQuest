@@ -4,6 +4,7 @@ This is a NodeJS command line project for testing out combat mechanics similar t
 
 ## Player
 
+```
 Level  Strength   Agility     HP        MP
 
  1         4         4        15         0
@@ -36,11 +37,13 @@ Level  Strength   Agility     HP        MP
 28       130       115       195       180
 29       135       120       200       190
 30       140       130       210       200
+```
 
 ## Enemies
 
 These are all the stats of the enemies.
 
+```
 ID  Enemy Name     Str Agi HP  Pat SR  DR  XP  GP
 
 00  Slime          05  03  03  00  0F  01  01  02
@@ -51,6 +54,7 @@ ID  Enemy Name     Str Agi HP  Pat SR  DR  XP  GP
 05  Magidrakee     0E  0E  0F  02  00  01  05  0C
 06  Scorpion       12  10  14  00  0F  01  06  10
 07  Druin          14  12  16  00  0F  02  07  10
+```
 
 ## Combat
 
