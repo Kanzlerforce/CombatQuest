@@ -25,6 +25,21 @@ let rl = readline.createInterface({
  output: process.stdout
 });
 
+// Determines if the monster does lesser damage, or more damage.
+function doLesserDamage() {
+    let out = false;
+    let enemyStrength = scorpion.str / 4;
+    let heroDefense = (myPlayer.defense() / 4) + 1;
+    if(enemyStrength < heroDefense)) {
+        out = true;
+    }
+    return out;
+}
+
+function attackMonster() {
+
+}
+
 function waitForUserInput() {
   rl.question("Command: ", function(answer) {
     if (answer == "exit"){
@@ -33,7 +48,7 @@ function waitForUserInput() {
         console.log("Available commands: help, ?, fight, status, exit");
         waitForUserInput();
     } else if(answer == 'fight') {
-        console.log("This feature is not yet implemented.");
+        this.attackMonster();
         waitForUserInput();
     } else if(answer == 'status') {
         console.log(myPlayer.print());

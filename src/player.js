@@ -6,6 +6,10 @@ const Player = class {
         this.hp = hp;
     }
 
+    defense() {
+        return Math.floor(this.agi / 2);
+    }
+
     print() {
         return `Name: ${this.name}\nSTR: ${this.str}\nAGI: ${this.agi}\nHP: ${this.hp}\n`;
     }
