@@ -79,16 +79,22 @@ GP is how much gold will be awarded, and this typically varies.
 
 The regular hero attack has a lower and an upper range, and the actual attack is a random number within that range.
 
+```
 lowerAttackLimit = (heroAttackPower - enemyAgility / 2) / 4;
 upperAttackLimit = (heroAttackPower - enemyAgility / 2) / 2;
+```
 
 If the damage is less than 1, then a 0 or 1 is chosen randomly.
 
+```
 heroAttackPower = heroStrength + weaponAttackPower
+```
 
 Just as a reference, the formula derived from the NES assembly for the hero regular attack is:
 
+```
 ((RAND + 256) * (HeroAttack - (EnemyAgility >> 1))) >> 10
+```
 
 where RAND is a random number between 0 and 255, inclusive. This formula relies upon bit shifting, and it isn't readily apparent what it's actually doing.
 
@@ -97,16 +103,22 @@ where RAND is a random number between 0 and 255, inclusive. This formula relies 
 The enemy will do a "weak" attack if (enemyStrength / 2) is less than
 ((heroDefense / 4) + 1).
 
+```
 heroDefense = (heroAgility / 2) + shieldDefenseRating + armorDefenseRating
+```
 
 The enemy's weak attack is a random value between 0 and ((enemyStrength + 4) / 6) -1.
 The complex/assembly formula for the weak attack is:
 
+```
  floor((((EnemyStrength + 2) * RAND + 1024) >> 9) / 3)
+```
 
  The enemy's regular attack is a random number between these two ranges:
 
+```
  lowerDamageLimit = (enemyStrength - heroDefense / 2) / 4;
  upperDamageLimit = ((enemyStrength - heroDefense) / 2) / 2) - 1;
+```
 
  If the enemy attack is less than 1, a random 0 or 1 is used instead.
