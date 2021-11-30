@@ -20,7 +20,7 @@ fs.readFile('./src/map.txt','utf-8',(err,data)=>{
 let myPlayer = new Player('Chris', 22, 20, 46);
 
 // name str agi hp gold
-let scorpion = new Mob('Scorpion', 18, 16, 20, 15);
+let enemy = new Mob('scorpion', 18, 16, 20, 15);
 
 let rl = readline.createInterface({
  input: process.stdin,
@@ -28,9 +28,9 @@ let rl = readline.createInterface({
 });
 
 // Determines if the monster does lesser damage, or more damage.
-function doLesserDamage() {
+function isWeakEnemy() {
     let out = false;
-    let enemyStrength = scorpion.str / 4;
+    let enemyStrength = enemy.str / 4;
     let heroDefense = (myPlayer.defense() / 4) + 1;
     if(enemyStrength < heroDefense) {
         out = true;
@@ -38,24 +38,65 @@ function doLesserDamage() {
     return out;
 }
 
-function attackMonster() {
+function enemyAttack() {
+    let enemyAttack = 0;
+    let lowerDamageLimit;
+    let upperDamageLimit;
+    let heroDefense;
+    if(isWeakEnemy()) {
+        // floor((((EnemyStrength + 2) * RAND + 1024) >> 9) / 3)
+        upperDamageLimit = (enemy.str + 4) / 6;
+        enemyAttack = utility.randomIntFromInterval(0, upperDamageLimit - 1);
+    } else {
+        /*
+        COMPLEX FORMULA:
+        ((256 + RAND) * (EnemyStrength - (HeroDefense >> 1) + 1) - 256) >> 10
 
-    if(scorpion.hp > 0) {
-        let low = (myPlayer.str - scorpion.agi / 2) / 4;
-        let high = (myPlayer.str - scorpion.agi / 2) / 2;
-        let myAttack = utility.randomIntFromInterval(low, high);
+        EASIER FORMULA:
+        (EnemyStrength - HeroDefense / 2) / 4,
+        to
+        (EnemyStrength - HeroDefense / 2) / 2
+
+        The hero's defense is equal to his agility / 2 rounded down, plus the modifiers
+        for his equipment.
+        */
+
+        lowerDamageLimit = (enemy.str - myPlayer.defense() / 2) / 4;
+        upperDamageLimit = (enemy.str - myPlayer.defense() / 2) / 2;
+
+        enemyAttack = utility.randomIntFromInterval(lowerDamageLimit, upperDamageLimit - 1);
+
+    }
+
+    if(enemyAttack < 1) {
+        enemyAttack = utility.randomIntFromInterval(0,1);
+    }
+    if(enemyAttack >= myPlayer.hp) {
+        myPlayer.hp = 0;
+        console.log(`The ${enemy.name} strikes for ${enemyAttack} damage. You die.`);
+    } else {
+        myPlayer.hp -= enemyAttack;
+        console.log(`The ${enemy.name} strikes you for ${enemyAttack} damage.`);
+    }
+}
+
+function heroRegularAttack() {
+    if(enemy.hp > 0) {
+        let lowerAttackLimit = (myPlayer.str - enemy.agi / 2) / 4;
+        let upperAttackLimit = (myPlayer.str - enemy.agi / 2) / 2;
+        let myAttack = utility.randomIntFromInterval(lowerAttackLimit, upperAttackLimit);
         if(myAttack < 1) {
             myAttack = utility.randomIntFromInterval(0,1);
         }
-        if(myAttack >= scorpion.hp) {
-            scorpion.hp = 0;
-            console.log(`You strike the scorpion for ${myAttack} damage. The scorpion dies.`);
+        if(myAttack >= enemy.hp) {
+            enemy.hp = 0;
+            console.log(`You strike the ${enemy.name} for ${myAttack} damage. The scorpion dies.`);
         } else {
-            scorpion.hp -= myAttack;
-            console.log(`You strike the scorpion for ${myAttack} damage.`);
+            enemy.hp -= myAttack;
+            console.log(`You strike the ${enemy.name} for ${myAttack} damage.`);
         }
     } else {
-        console.log("You flog the scorpion's lifeless body once more.");
+        console.log(`You flog the ${enemy.name}'s lifeless body once more.`);
     }
 }
 
@@ -67,11 +108,18 @@ function waitForUserInput() {
         console.log("Available commands: help, ?, fight, status, exit");
         waitForUserInput();
     } else if(answer == 'fight') {
-        attackMonster();
+        if(myPlayer.hp > 0) {
+            heroRegularAttack();
+            if(enemy.hp > 0) {
+                enemyAttack();
+            }
+        } else {
+            console.log("You are dead.");
+        }
         waitForUserInput();
     } else if(answer == 'status') {
         console.log(myPlayer.print());
-        console.log(scorpion.print());
+        console.log(enemy.print());
         waitForUserInput();
     } else {
         waitForUserInput();

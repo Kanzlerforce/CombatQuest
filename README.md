@@ -5,7 +5,8 @@ This is a NodeJS command line project for testing out combat mechanics similar t
 ## Math
 
 x >> k
-x divided by 2^k
+
+It means: x divided by 2^k
 
 ## Player
 
@@ -72,52 +73,40 @@ HP is how many hit points the enemy has, and this typically varies.
 
 GP is how much gold will be awarded, and this typically varies.
 
-### Enemy Combat Formulas
+### Combat Formulas
 
-#### Melee
+#### Hero Attacks
 
-There are two formulas for attack damage for enemies.  The standard range is
-from:
+The regular hero attack has a lower and an upper range, and the actual attack is a random number within that range.
 
-(EnemyStrength - HeroDefense / 2) / 4,
+lowerAttackLimit = (heroAttackPower - enemyAgility / 2) / 4;
+upperAttackLimit = (heroAttackPower - enemyAgility / 2) / 2;
 
-to:
+If the damage is less than 1, then a 0 or 1 is chosen randomly.
 
-(EnemyStrength - HeroDefense / 2) / 2
+heroAttackPower = heroStrength + weaponAttackPower
 
-The hero's defense is equal to his agility / 2 rounded down, plus the modifiers
-for his equipment.
+Just as a reference, the formula derived from the NES assembly for the hero regular attack is:
 
+((RAND + 256) * (HeroAttack - (EnemyAgility >> 1))) >> 10
 
-The other type of attack happens if your defense power is greater than or equal
-to the enemy's strength.  In that case, the range is from:
+where RAND is a random number between 0 and 255, inclusive. This formula relies upon bit shifting, and it isn't readily apparent what it's actually doing.
 
-0
+#### Enemy Attacks
 
-to:
+The enemy will do a "weak" attack if (enemyStrength / 2) is less than
+((heroDefense / 4) + 1).
 
-(enemyStrength + 4) / 6
+heroDefense = (heroAgility / 2) + shieldDefenseRating + armorDefenseRating
 
-#### Melee Combat Example 1
+The enemy's weak attack is a random value between 0 and ((enemyStrength + 4) / 6) -1.
+The complex/assembly formula for the weak attack is:
 
-Player:
-4 agility
-HeroDefense = floor(agi / 2) => 2
+ floor((((EnemyStrength + 2) * RAND + 1024) >> 9) / 3)
 
-Enemy: 5 strength
+ The enemy's regular attack is a random number between these two ranges:
 
-Attack Damage Ranges:
-    Low: (5 - 2 / 2) / 4 => (5 - 1) / 4 => 1
-    High: (5 - 2 / 2) / 2 => (5 - 1) / 2 => 2
+ lowerDamageLimit = (enemyStrength - heroDefense / 2) / 4;
+ upperDamageLimit = ((enemyStrength - heroDefense) / 2) / 2) - 1;
 
-#### Melee Combat Example 2
-
-Player:
-10 agility
-HeroDefense = floor(agi / 2) => 5
-
-Enemy: 5 strength
-
-Attack Damage Ranges:
-    Low: 0
-    High: (5 + 4) / 6 => 9 / 6 => 1.5
+ If the enemy attack is less than 1, a random 0 or 1 is used instead.

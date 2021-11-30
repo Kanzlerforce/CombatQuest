@@ -5,7 +5,7 @@
   "type": "module",
   "main": "src/main.js",
   "scripts": {
-    "test": "node ./src/test",
+    "test": "node ./src/testrunner",
     "start": "node ./src/main"
   },
   "author": "Chris Cansler",
