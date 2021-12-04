@@ -4,6 +4,7 @@ import chalk from 'chalk'
 import utility from './utility.js'
 import Player from './player.js'
 import Mob from './mob.js'
+import { enemies } from './data/enemies.js'
 
 //let myPlayer = new Player('Chris', 10, 5, 12);
 //console.log(myPlayer.print());
@@ -17,10 +18,10 @@ fs.readFile('./src/map.txt','utf-8',(err,data)=>{
 
 // level 8 Player
 // name str agi hp
-let myPlayer = new Player('Chris', 22, 20, 46);
+let myPlayer = new Player('Chris', 4, 5, 15);
 
 // name str agi hp gold
-let enemy = new Mob('scorpion', 18, 16, 20, 15);
+let enemy = new Mob(enemies.ghost);
 
 let rl = readline.createInterface({
  input: process.stdin,
@@ -38,11 +39,26 @@ function isWeakEnemy() {
     return out;
 }
 
+function chanceIn64(chance) {
+    let randomNumber;
+    chance = chance - 1;
+
+    randomNumber = utility.rand(64); // random number betwee 0 and 63
+    // chance | randomNumber   |    randomNumber <= chance
+    // -------------------------------------------------
+    //   -1     0                   false
+    //    0     0, 1, 2             true, false, false...
+    //    1     0, 1, 2             true, true, false...
+
+    return randomNumber <= chance;
+}
+
 function enemyAttack() {
     let enemyAttack = 0;
     let lowerDamageLimit;
     let upperDamageLimit;
     let heroDefense;
+    let msg = '';
     if(isWeakEnemy()) {
         // floor((((EnemyStrength + 2) * RAND + 1024) >> 9) / 3)
         upperDamageLimit = (enemy.str + 4) / 6;
@@ -71,29 +87,37 @@ function enemyAttack() {
     if(enemyAttack < 1) {
         enemyAttack = utility.randomIntFromInterval(0,1);
     }
+    msg = `The ${enemy.name} attacks! Thy hit points decreased by ${enemyAttack}.`;
     if(enemyAttack >= myPlayer.hp) {
         myPlayer.hp = 0;
-        console.log(`The ${enemy.name} strikes for ${enemyAttack} damage. You die.`);
+        console.log(`${msg} Thou hast been slain`);
     } else {
         myPlayer.hp -= enemyAttack;
-        console.log(`The ${enemy.name} strikes you for ${enemyAttack} damage.`);
+        console.log(msg);
     }
 }
 
 function heroRegularAttack() {
+    let msg = '';
     if(enemy.hp > 0) {
-        let lowerAttackLimit = (myPlayer.str - enemy.agi / 2) / 4;
-        let upperAttackLimit = (myPlayer.str - enemy.agi / 2) / 2;
-        let myAttack = utility.randomIntFromInterval(lowerAttackLimit, upperAttackLimit);
-        if(myAttack < 1) {
-            myAttack = utility.randomIntFromInterval(0,1);
-        }
-        if(myAttack >= enemy.hp) {
-            enemy.hp = 0;
-            console.log(`You strike the ${enemy.name} for ${myAttack} damage. The scorpion dies.`);
+        if(chanceIn64(enemy.dodge)) {
+            console.log(`${enemy.name} dodges your attack!`);
         } else {
-            enemy.hp -= myAttack;
-            console.log(`You strike the ${enemy.name} for ${myAttack} damage.`);
+            let lowerAttackLimit = (myPlayer.str - enemy.agi / 2) / 4;
+            let upperAttackLimit = (myPlayer.str - enemy.agi / 2) / 2;
+            let myAttack = utility.randomIntFromInterval(lowerAttackLimit, upperAttackLimit);
+            if(myAttack < 1) {
+                myAttack = utility.randomIntFromInterval(0,1);
+            }
+            console.log(`${myPlayer.name} attacks!`);
+            msg = `The ${enemy.name}'s hit points have been reduced by ${myAttack}.`;
+            if(myAttack >= enemy.hp) {
+                enemy.hp = 0;
+                console.log(`${msg} Thou hast done well in defeating the ${enemy.name}.`);
+            } else {
+                enemy.hp -= myAttack;
+                console.log(msg);
+            }
         }
     } else {
         console.log(`You flog the ${enemy.name}'s lifeless body once more.`);

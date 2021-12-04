@@ -1,17 +1,19 @@
 import { TestLibrary } from './testlibrary.js'
 import * as dummy from './dummytestlibrary.js'
+import { enemies } from './data/enemies.js'
 
 let test = {
-    testLib: 1,
-    add: 1,
+    active: 1,
+    add: 0,
     randomIntervalTest: 0,
     heroRegularAttack: 0,
     enemyWeakAttack: 0,
     enemyRegularAttack: 0,
-    dummyTests: 1,
-}
+    changeIn64: 1,
+};
+let dummyTests = 0;
 
-if(test.testLib) {
+if(test.active) {
     let testlib = new TestLibrary();
 
     if(test.add) {
@@ -36,9 +38,13 @@ if(test.testLib) {
     if(test.enemyRegularAttack) {
         testlib.enemyRegularAttack();
     }
+
+    if(test.changeIn64) {
+        testlib.chanceIn64(enemies.ghost.dodge);
+    }
 }
 
-if(test.dummyTests) {
+if(dummyTests) {
     dummy.sayHi("Chris");
     dummy.sayGoodbye();
 }

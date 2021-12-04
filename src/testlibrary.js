@@ -5,6 +5,31 @@ export class TestLibrary {
 
     }
 
+    chanceIn64(chance) {
+        let tally = {
+            hits: 0,
+            dodges: 0
+        }
+        let randomNumber;
+        chance = chance - 1;
+        for (var i = 0; i < 64; i++) {
+            randomNumber = utility.rand(64); // random number betwee 0 and 63
+            // chance | randomNumber    |    randomNumber <= chance
+            // --------------------------------------------------
+            //   -1     0                   false
+            //    0     0, 1, 2             true, false, false...
+            //    1     0, 1, 2             true, true, false...
+            if (randomNumber <= chance) {
+                tally.dodges += 1;
+            } else {
+                tally.hits += 1;
+            }
+        }
+
+        console.log(`hits: ${tally.hits}`);
+        console.log(`dodges: ${tally.dodges}`);
+    }
+
     add(x=2, y=2) {
         console.log('Test: add()');
         console.log(`x: ${x} y: ${y}`);
