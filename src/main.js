@@ -90,10 +90,14 @@ function enemyAttack() {
     msg = `The ${enemy.name} attacks! Thy hit points decreased by ${enemyAttack}.`;
     if(enemyAttack >= myPlayer.hp) {
         myPlayer.hp = 0;
-        console.log(`${msg} Thou hast been slain`);
+        console.log(`${msg} Thou hast been slain.`);
     } else {
         myPlayer.hp -= enemyAttack;
-        console.log(msg);
+        if(enemyAttack == 0) {
+            console.log(`The ${enemy.name} attacks! A miss! No damage hath been scored.`);
+        } else {
+            console.log(msg);
+        }
     }
 }
 
@@ -110,7 +114,11 @@ function heroRegularAttack() {
                 myAttack = utility.randomIntFromInterval(0,1);
             }
             console.log(`${myPlayer.name} attacks!`);
-            msg = `The ${enemy.name}'s hit points have been reduced by ${myAttack}.`;
+            if(myAttack == 0) {
+                msg = 'The attack failed and there was no loss of hit points!';
+            } else {
+                msg = `The ${enemy.name}'s hit points have been reduced by ${myAttack}.`;
+            }
             if(myAttack >= enemy.hp) {
                 enemy.hp = 0;
                 console.log(`${msg} Thou hast done well in defeating the ${enemy.name}.`);
@@ -124,12 +132,21 @@ function heroRegularAttack() {
     }
 }
 
+function resetTheGame() {
+    // Level 1 player
+    // name str agi hp
+    myPlayer = new Player('Chris', 4, 5, 15);
+
+    // name str agi hp gold
+    enemy = new Mob(enemies.ghost);
+}
+
 function waitForUserInput() {
   rl.question("Command: ", function(answer) {
     if (answer == "exit"){
         rl.close();
     } else if (answer == '?' || answer == 'help') {
-        console.log("Available commands: help, ?, fight, status, exit");
+        console.log("Available commands: help, ?, fight, status, reset, exit");
         waitForUserInput();
     } else if(answer == 'fight') {
         if(myPlayer.hp > 0) {
@@ -145,10 +162,19 @@ function waitForUserInput() {
         console.log(myPlayer.print());
         console.log(enemy.print());
         waitForUserInput();
+    } else if(answer == 'reset') {
+        resetTheGame();
+        waitForUserInput();
     } else {
+        console.log("Invalid command.");
         waitForUserInput();
     }
   });
 }
-
+console.log("* * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+console.log("* * *           Welcome to COMBAT QUEST           * * *");
+console.log("* * * *                Version 1.0              * * * *");
+console.log("* * * * *           by: Chris Cansler         * * * * *");
+console.log("* * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+console.log("");
 waitForUserInput();
